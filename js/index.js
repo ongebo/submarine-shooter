@@ -3,6 +3,9 @@ var scene; // The root scene graph node.
 var camera;
 var renderer;
 
+var submarine; // The submarine.
+var subRotor; // The submarine's rotor.
+
 function init() {
     try {
         canvas = document.getElementById("viewport");
@@ -18,7 +21,7 @@ function init() {
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setClearColor(0xeeeeee);
         renderer.render(scene, camera);
-        // animate();
+        animate();
     } catch (e) {
         var errorOutput = document.getElementById("error-message");
         errorOutput.innerHTML = "<h1>Enable WebGL to continue.</h1>";
@@ -51,7 +54,7 @@ function createSubmarine() {
     var subRotor = createSubRotor();
 
     // Create the submarine.
-    var submarine = new THREE.Object3D();
+    submarine = new THREE.Object3D();
     submarine.add(subBody);
     submarine.add(subTower);
     submarine.add(subRotor);
@@ -93,7 +96,7 @@ function createSubRotor() {
     var rotorWing3 = cylinder.clone();
 
     // Create the submarine's rotor from its individual parts.
-    var subRotor = new THREE.Object3D();
+    subRotor = new THREE.Object3D();
     subRotor.add(rotorShaft);
     subRotor.add(rotorWing1);
     subRotor.add(rotorWing2);
@@ -120,7 +123,18 @@ function createShooter() {
 }
 
 function animate() {
-    scene.rotation.x += 0.02;
+    updateForNextFrame();
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
+}
+
+function updateForNextFrame() {
+    subRotor.rotation.x += 0.08;
+    var randomAdd = Math.floor(Math.random() * 11) - 5;
+    submarine.position.x += randomAdd;
+    if (submarine.position.x > 50) {
+        submarine.position.x = 50;
+    } else if (submarine.position.x < -50) {
+        submarine.position.x = -50;
+    }
 }
