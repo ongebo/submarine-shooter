@@ -11,12 +11,14 @@ function init() {
 
         var cameraAspectRatio = canvas.width / canvas.height;
         camera = new THREE.PerspectiveCamera(45, cameraAspectRatio, 1, 1000);
-        camera.position.z = 90;
+        camera.position.z = 100;
+        camera.position.y = 40;
+        camera.rotation.x = -0.1;
 
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setClearColor(0xeeeeee);
         renderer.render(scene, camera);
-        animate();
+        // animate();
     } catch (e) {
         var errorOutput = document.getElementById("error-message");
         errorOutput.innerHTML = "<h1>Enable WebGL to continue.</h1>";
@@ -26,10 +28,15 @@ function init() {
 
 function buildWorld() {
     var submarine = createSubmarine();
-    var shooter = createShooter();
-    shooter.scale.set(2, 2, 2);
-    shooter.rotation.x = Math.PI / 4;
+    submarine.scale.set(0.4, 0.4, 0.4);
+    submarine.position.y = -5;
 
+    var shooter = createShooter();
+    shooter.position.set(0, 40, 20);
+    shooter.rotation.x = -Math.atan(40 / 20);
+    shooter.rotation.y = Math.PI;
+
+    scene.add(submarine);
     scene.add(shooter);
 
     // Configure lighting for the scene.
@@ -113,8 +120,7 @@ function createShooter() {
 }
 
 function animate() {
-    var rotor = scene.children[0];
-    rotor.rotation.y -= 0.01;
+    scene.rotation.x += 0.02;
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
