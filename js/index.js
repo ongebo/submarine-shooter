@@ -144,11 +144,8 @@ function animate() {
 
 function updateForNextFrame() {
     subRotor.rotation.x += 0.08;
-    var randomAdd = Math.floor(Math.random() * 11) - 5;
-    submarine.position.x += randomAdd;
-    if (submarine.position.x > 50) {
-        submarine.position.x = 50;
-    } else if (submarine.position.x < -50) {
-        submarine.position.x = -50;
+    submarine.position.x -= 2;
+    if (submarine.position.x < -100) {
+        submarine.position.x = 100;
     }
 }
