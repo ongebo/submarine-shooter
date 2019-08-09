@@ -5,6 +5,7 @@ var renderer;
 
 var submarine; // The submarine.
 var subRotor; // The submarine's rotor.
+var shooter; // The submarine shooter.
 
 function init() {
     try {
@@ -21,6 +22,7 @@ function init() {
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setClearColor(0xeeeeee);
         renderer.render(scene, camera);
+        attachEventHandlers();
         animate();
     } catch (e) {
         var errorOutput = document.getElementById("error-message");
@@ -116,10 +118,22 @@ function createShooter() {
     var bomb = new THREE.Mesh(bombGeometry, bombMaterial);
     bomb.position.z = 2;
 
-    var shooter = new THREE.Object3D();
+    shooter = new THREE.Object3D();
     shooter.add(body);
     shooter.add(bomb);
     return shooter;
+}
+
+function attachEventHandlers() {
+    document.addEventListener("keydown", function(event) {
+        switch (event.keyCode) {
+            case 37: // Left arrow key.
+                shooter.position.x -= 1;
+                break;
+            case 39: // Right arrow key.
+                shooter.position.x += 1;
+        }
+    });
 }
 
 function animate() {
