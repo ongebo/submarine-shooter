@@ -25,17 +25,7 @@ function init() {
 }
 
 function buildWorld() {
-    var subBody = createSubBody();
-    var subTower = createSubTower();
-    var subRotor = createSubRotor();
-
-    // Create the submarine.
-    var submarine = new THREE.Object3D();
-    submarine.add(subBody);
-    submarine.add(subTower);
-    submarine.add(subRotor);
-
-    // Create the submarine shooter.
+    var submarine = createSubmarine();
     var shooter = createShooter();
     shooter.scale.set(2, 2, 2);
     shooter.rotation.x = Math.PI / 4;
@@ -46,6 +36,19 @@ function buildWorld() {
     var light = new THREE.DirectionalLight();
     light.position.set(0, 0, 100);
     scene.add(light);
+}
+
+function createSubmarine() {
+    var subBody = createSubBody();
+    var subTower = createSubTower();
+    var subRotor = createSubRotor();
+
+    // Create the submarine.
+    var submarine = new THREE.Object3D();
+    submarine.add(subBody);
+    submarine.add(subTower);
+    submarine.add(subRotor);
+    return submarine;
 }
 
 function createSubBody() {
