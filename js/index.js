@@ -7,6 +7,15 @@ var submarine; // The submarine.
 var subRotor; // The submarine's rotor.
 var shooter; // The submarine shooter.
 
+// Variables changed when exploding the submarine.
+var submarineIsExploding;
+var subBody;
+var subBodyMaterial;
+var subTower;
+var subTowerMaterial;
+var subTowerPositionY;
+var explosionFrameNumber;
+
 var bomb;
 var bombIsDropping;
 var bombPositionY;
@@ -29,6 +38,8 @@ function init() {
         renderer.render(scene, camera);
 
         bombIsDropping = false;
+        submarineIsExploding = false;
+        explosionFrameNumber = 10;
         attachEventHandlers();
         animate();
     } catch (e) {
@@ -72,17 +83,18 @@ function createSubmarine() {
 
 function createSubBody() {
     var subBodyGeometry = new THREE.SphereGeometry(10, 100, 100);
-    var subBodyMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
-    var subBody = new THREE.Mesh(subBodyGeometry, subBodyMaterial);
+    subBodyMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+    subBody = new THREE.Mesh(subBodyGeometry, subBodyMaterial);
     subBody.scale.x = 4;
     return subBody;
 }
 
 function createSubTower() {
-    var subTopGeometry = new THREE.BoxGeometry(10, 5, 7);
-    var subTopMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
-    var subTower = new THREE.Mesh(subTopGeometry, subTopMaterial);
+    var subTowerGeometry = new THREE.BoxGeometry(10, 5, 7);
+    subTowerMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+    subTower = new THREE.Mesh(subTowerGeometry, subTowerMaterial);
     subTower.position.y = 10.5;
+    subTowerPositionY = subTower.position.y;
     return subTower;
 }
 
@@ -159,18 +171,69 @@ function animate() {
 }
 
 function updateForNextFrame() {
-    subRotor.rotation.x += 0.08;
-    submarine.position.x -= 2;
-    if (submarine.position.x < -100) {
-        submarine.position.x = 100;
+    if (submarineIsExploding) {
+        explodeSubmarine();
+    } else {
+        subRotor.rotation.x += 0.08;
+        submarine.position.x -= 2;
+        if (submarine.position.x < -100) {
+            submarine.position.x = 100;
+        }
     }
 
     if (bombIsDropping) {
         bomb.position.z++;
+        if (collisionIsMade(bomb.position.z)) {
+            submarineIsExploding = true;
+            resetBomb();
+        }
         if (bomb.position.z > 80) {
-            bombIsDropping = false;
-            bomb.position.y = bombPositionY;
-            bomb.position.z = bombPositionZ;
+            resetBomb();
         }
     }
+}
+
+function collisionIsMade(bombHeight) {
+    // Vertical and horizontal separations between centers of the bomb
+    // and submarine for which collision is made.
+    var collisionHeight = 45 - 0.6 - 8; // TODO: don't hardcode the calculation.
+    var collisionWidth = 18;
+
+    var bombPosition = new THREE.Vector3().setFromMatrixPosition(
+        bomb.matrixWorld
+    );
+    var submarinePosition = new THREE.Vector3().setFromMatrixPosition(
+        submarine.matrixWorld
+    );
+
+    var width = submarinePosition.x - bombPosition.x;
+    var heightInRange =
+        bombHeight >= collisionHeight && bombHeight <= collisionHeight + 8;
+    var widthInRange = Math.abs(width) <= collisionWidth;
+    return heightInRange && widthInRange;
+}
+
+function resetBomb() {
+    bombIsDropping = false;
+    bomb.position.y = bombPositionY;
+    bomb.position.z = bombPositionZ;
+}
+
+function explodeSubmarine() {
+    explosionFrameNumber += 10;
+    if (explosionFrameNumber > 220) {
+        submarineIsExploding = false;
+        explosionFrameNumber = 10;
+        subBody.material = subBodyMaterial;
+        subTower.material = subTowerMaterial;
+        subTower.position.y = subTowerPositionY;
+        return;
+    }
+    subBody.material = new THREE.MeshPhongMaterial({
+        color: new THREE.Color(explosionFrameNumber, 0, 0)
+    });
+    subTower.material = new THREE.MeshPhongMaterial({
+        color: new THREE.Color(explosionFrameNumber, 0, 0)
+    });
+    subTower.position.y++;
 }
