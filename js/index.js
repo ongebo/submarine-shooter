@@ -7,6 +7,11 @@ var submarine; // The submarine.
 var subRotor; // The submarine's rotor.
 var shooter; // The submarine shooter.
 
+var bomb;
+var bombIsDropping;
+var bombPositionY;
+var bombPositionZ;
+
 function init() {
     try {
         canvas = document.getElementById("viewport");
@@ -22,6 +27,8 @@ function init() {
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setClearColor(0xeeeeee);
         renderer.render(scene, camera);
+
+        bombIsDropping = false;
         attachEventHandlers();
         animate();
     } catch (e) {
@@ -115,7 +122,7 @@ function createShooter() {
 
     var bombGeometry = new THREE.SphereGeometry(0.6, 100, 100);
     var bombMaterial = new THREE.MeshLambertMaterial({ color: 0xfe0000 });
-    var bomb = new THREE.Mesh(bombGeometry, bombMaterial);
+    bomb = new THREE.Mesh(bombGeometry, bombMaterial);
     bomb.position.z = 2;
 
     shooter = new THREE.Object3D();
@@ -126,12 +133,21 @@ function createShooter() {
 
 function attachEventHandlers() {
     document.addEventListener("keydown", function(event) {
+        if (bombIsDropping) {
+            return;
+        }
         switch (event.keyCode) {
             case 37: // Left arrow key.
                 shooter.position.x -= 1;
                 break;
             case 39: // Right arrow key.
                 shooter.position.x += 1;
+                break;
+            case 40: // Down arrow key.
+                bombPositionY = bomb.position.y;
+                bombPositionZ = bomb.position.z;
+                bombIsDropping = true;
+                break;
         }
     });
 }
@@ -147,5 +163,14 @@ function updateForNextFrame() {
     submarine.position.x -= 2;
     if (submarine.position.x < -100) {
         submarine.position.x = 100;
+    }
+
+    if (bombIsDropping) {
+        bomb.position.z++;
+        if (bomb.position.z > 80) {
+            bombIsDropping = false;
+            bomb.position.y = bombPositionY;
+            bomb.position.z = bombPositionZ;
+        }
     }
 }
