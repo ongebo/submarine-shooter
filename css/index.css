@@ -4,6 +4,13 @@ body {
 }
 
 canvas {
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
   display: block;
   margin: auto;
+}
+
+h2 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  text-align: center;
 }

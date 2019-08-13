@@ -145,6 +145,7 @@ function createShooter() {
 
 function attachEventHandlers() {
     document.addEventListener("keydown", function(event) {
+        event.preventDefault();
         if (bombIsDropping) {
             return;
         }
